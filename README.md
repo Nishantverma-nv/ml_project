@@ -44,9 +44,14 @@ python main.py
 
 Then open <http://127.0.0.1:5001>.
 
-The dashboard frontend is already connected to Flask: `gridbalance/templates/index.html`
-renders each pipeline page, and `gridbalance/static/style.css` provides its styling.
-No separate frontend server is needed.
+## Project structure
+
+- `frontend/templates/` and `frontend/static/` contain the dashboard UI and styles.
+- `backend/` contains the Flask app, forecasting/data-processing modules, and `data/`
+  with the regional CSV and combined archives.
+- The Flask backend serves the frontend from its separate folder on the same origin;
+  no separate frontend server or CORS configuration is needed.
+- `legacy/old_3d_backup/` preserves the unused earlier FastAPI/Three.js prototype.
 
 ## Deploying to Render with Docker
 
@@ -64,7 +69,7 @@ Open <http://127.0.0.1:10000>. Stop the container with `Ctrl+C`.
 ### Deploy on Render
 
 1. Push this project to a GitHub repository. Keep `Dockerfile`, `.dockerignore`,
-   `requirements.txt`, `main.py`, and the `gridbalance/` folder at the repository
+   `requirements.txt`, `main.py`, `backend/`, and `frontend/` at the repository
    root. The included `.gitignore` keeps local virtual environments and IDE files
    out of the GitHub upload.
 2. In Render, choose **New + → Web Service**, then connect the GitHub repository
@@ -82,19 +87,18 @@ Open <http://127.0.0.1:10000>. Stop the container with `Ctrl+C`.
 
 If you have not pushed to GitHub before, create an empty repository there, then
 use GitHub Desktop to add this project folder, commit the files, and publish the
-branch. Ensure the large dataset files in `gridbalance/` are included; they are
-used by the deployed app.
+branch. Ensure the dataset files in `backend/data/` are included; they are used
+by the deployed app.
 
 To read the pipeline output in the console instead of the browser, run the
 walkthrough script:
 
 ```
-python gridbalance/main.py
+python backend/main.py
 ```
 
-If you run `gridbalance/App.py` directly in PyCharm, set the working directory
-to `gridbalance` so Flask can find `templates/` and `static/`. The root
-`main.py` handles this for you.
+If you run `backend/App.py` directly in PyCharm, the frontend and data paths are
+resolved from the project root. The root `main.py` is the recommended launcher.
 
 ## Stages
 
@@ -114,8 +118,8 @@ full pipeline.
 
 ## Datasets
 
-The 12 regional CSVs (`*_hourly.csv`) live directly in `gridbalance/`. Two
-combined files derive from them:
+The 12 regional CSVs (`*_hourly.csv`) live in `backend/data/`. Two combined
+files derive from them:
 
 - `est_hourly.parquet` — the wide archive with every regional series side by
   side, loaded through `pyarrow` (falls back to `pjm_hourly_est.csv`).
@@ -127,21 +131,21 @@ combined files derive from them:
 
 | File | Responsibility |
 | --- | --- |
-| `gridbalance/App.py` | Flask app, routes, global stats context |
-| `gridbalance/load_data.py` | Regional, combined, and long master archive loading |
-| `gridbalance/eda_charts.py` | Inline SVG chart engine (line, bar, donut, heatmap, multi-line) |
-| `gridbalance/network_overview.py` | Cross-region summary and charts for `/network` |
-| `gridbalance/preprocessing.py` | Cleaning and feature engineering |
-| `gridbalance/model_training.py` | Model fitting, baselines, metrics, benchmark cache |
-| `gridbalance/prediction.py` | Recursive forecasting |
-| `gridbalance/anomaly_detection.py` | Anomaly rules |
-| `gridbalance/main.py` | Console walkthrough |
-| `gridbalance/templates/index.html` | Single server-rendered template |
-| `gridbalance/static/style.css` | Dashboard styling |
+| `backend/App.py` | Flask app, routes, global stats context |
+| `backend/load_data.py` | Regional, combined, and long master archive loading |
+| `backend/eda_charts.py` | Inline SVG chart engine (line, bar, donut, heatmap, multi-line) |
+| `backend/network_overview.py` | Cross-region summary and charts for `/network` |
+| `backend/preprocessing.py` | Cleaning and feature engineering |
+| `backend/model_training.py` | Model fitting, baselines, metrics, benchmark cache |
+| `backend/prediction.py` | Recursive forecasting |
+| `backend/anomaly_detection.py` | Anomaly rules |
+| `backend/main.py` | Console walkthrough |
+| `frontend/templates/index.html` | Single server-rendered template |
+| `frontend/static/style.css` | Dashboard styling |
 
 ## Notes
 
 - Model benchmarks are cached per region, so revisiting the training page for a
   region you already ran returns immediately.
-- `gridbalance/_old_3d_backup/` holds the previous FastAPI and Three.js
+- `legacy/old_3d_backup/` holds the previous FastAPI and Three.js
   implementation. It is not used by the current app.

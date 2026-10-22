@@ -11,8 +11,8 @@ import pandas as pd
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# The hourly CSV archives live directly inside the project folder
-DATA_DIR = BASE_DIR
+# Regional CSV and combined parquet archives live in backend/data.
+DATA_DIR = BASE_DIR / "data"
 
 
 # =========================================================
@@ -698,4 +698,3 @@ if __name__ == "__main__":
     print(json.dumps(get_archives_overview(), indent=2, default=str))
     print()
     print(json.dumps(get_combined_summary(), indent=2, default=str))
-

@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "gunicorn --chdir gridbalance --bind 0.0.0.0:${PORT:-10000} --timeout 120 App:app"]
+CMD ["sh", "-c", "gunicorn --chdir backend --bind 0.0.0.0:${PORT:-10000} --timeout 120 App:app"]

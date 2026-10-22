@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from flask import Flask, render_template, request
 
@@ -21,7 +22,14 @@ from prediction import get_forecast_form_options, predict_demand
 from preprocessing import get_preprocessing_summary
 
 
-app = Flask(__name__)
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = PROJECT_DIR / "frontend"
+
+app = Flask(
+    __name__,
+    template_folder=str(FRONTEND_DIR / "templates"),
+    static_folder=str(FRONTEND_DIR / "static"),
+)
 
 
 # =========================================================
